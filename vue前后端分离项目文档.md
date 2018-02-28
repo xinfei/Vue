@@ -167,4 +167,38 @@ For Vue 1.x use: vue init webpack#1.0 my-project
                 2. 设置统一的接口访问地址，便于后期统一他调整。
                 3. 为所有请求设置timeout值，这里设置为6s，超过6s则抛出超时异常。
     3. 用户列表页面介绍
-    
+        > 用户列表由`Main.vue`+`User.vue`组成。
+        1. Main.vue
+            1. 主要用来存放页面的功能模块，包括头部登录信息栏，标题栏，左侧导航栏，面包屑导航等。
+            2. 主要功能包含左侧导航栏和右上角头像显示以及滑过后的展开一些跳转链接等。
+            3. 退出登录功能：路由指向登录页`/login`，并清楚用户登录session数据。
+        2. User.vue
+            1. 包含功能：列表显示、根据表头项排序、根据条件筛选数据、分页。
+                1. 列表显示：
+                    运用api.js中的`getUserListPage`方法来获取用户列表数据。
+                    <pre>
+                    if(this.seachItem == 'account'){
+                      para = {
+                        offset: (this.page - 1)*10,
+                        account:this.filters.name
+                      };
+                    } else{
+                      para = {
+                        offset: (this.page - 1)*10,
+                        name:this.filters.name
+                      };
+                    }
+                    getUserListPage(para).then((res) => {
+                        this.total = res.data.total;
+                        this.users = res.data.rows;
+                        this.listLoading = false;
+                        //NProgress.done();
+                    })
+                    </pre>
+                    > 其中para为参数部分，`offset`为数据偏移量-说白了就是数据从第几条开始，默认一次出10条数据。
+                2. 分页    
+                    > 原理同上，根据页数*条数来改变offset的值，从而获取新页的数据。
+                3. 根据条件筛选数据
+                    > 根据页面下来选来判断是通过账号查找，还是通过姓名查找，这个根据选项来传递参数是`account`还是`name`。然后与`offset`参数一起发送给接口，返回筛选后的数据。
+                4. 根据标题项排序
+                    > 此功能为element-ui 表格自带功能，只需在需要排序的列上加入`sortalbe`属性即可。例如：`<el-table-column prop="phone" label="电话" width="130" sortable></el-table-column>`        
