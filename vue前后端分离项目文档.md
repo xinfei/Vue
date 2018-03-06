@@ -156,49 +156,88 @@ For Vue 1.x use: vue init webpack#1.0 my-project
             },
             </pre>
             2. 登录
-                1. 参数获取
-                2. 调取api.js中的交互方法发送数据，根据返回结果进行操作
-                3. 登录成功，把返回的用户信息，存储到session中
-                4. 登录失败，则给予对应提示。
-                5. 异常捕获，防止页面假死。
+                + 参数获取
+                + 调取api.js中的交互方法发送数据，根据返回结果进行操作
+                + 登录成功，把返回的用户信息，存储到session中
+                + 登录失败，则给予对应提示。
+                + 异常捕获，防止页面假死。
                 代码参考：`/src/views/Login.vue`
             3. api.js相关接口设置
-                1. 利用axios的interceptors拦截方法，判断是否可读取到session中的用户数据，如果有则放到请求头中一起发送。
-                2. 设置统一的接口访问地址，便于后期统一他调整。
-                3. 为所有请求设置timeout值，这里设置为6s，超过6s则抛出超时异常。
-    3. 用户列表页面介绍
-        > 用户列表由`Main.vue`+`User.vue`组成。
-        1. Main.vue
-            1. 主要用来存放页面的功能模块，包括头部登录信息栏，标题栏，左侧导航栏，面包屑导航等。
-            2. 主要功能包含左侧导航栏和右上角头像显示以及滑过后的展开一些跳转链接等。
-            3. 退出登录功能：路由指向登录页`/login`，并清楚用户登录session数据。
-        2. User.vue
-            1. 包含功能：列表显示、根据表头项排序、根据条件筛选数据、分页。
-                1. 列表显示：
-                    运用api.js中的`getUserListPage`方法来获取用户列表数据。
-                    <pre>
-                    if(this.seachItem == 'account'){
-                      para = {
-                        offset: (this.page - 1)*10,
-                        account:this.filters.name
-                      };
-                    } else{
-                      para = {
-                        offset: (this.page - 1)*10,
-                        name:this.filters.name
-                      };
-                    }
-                    getUserListPage(para).then((res) => {
-                        this.total = res.data.total;
-                        this.users = res.data.rows;
-                        this.listLoading = false;
-                        //NProgress.done();
-                    })
-                    </pre>
-                    > 其中para为参数部分，`offset`为数据偏移量-说白了就是数据从第几条开始，默认一次出10条数据。
-                2. 分页    
-                    > 原理同上，根据页数*条数来改变offset的值，从而获取新页的数据。
-                3. 根据条件筛选数据
-                    > 根据页面下来选来判断是通过账号查找，还是通过姓名查找，这个根据选项来传递参数是`account`还是`name`。然后与`offset`参数一起发送给接口，返回筛选后的数据。
-                4. 根据标题项排序
-                    > 此功能为element-ui 表格自带功能，只需在需要排序的列上加入`sortalbe`属性即可。例如：`<el-table-column prop="phone" label="电话" width="130" sortable></el-table-column>`        
+                + 利用axios的interceptors拦截方法，判断是否可读取到session中的用户数据，如果有则放到请求头中一起发送。
+                + 设置统一的接口访问地址，便于后期统一他调整。
+                + 为所有请求设置timeout值，这里设置为6s，超过6s则抛出超时异常。
+3. 用户列表功能说明
+    > 用户列表由`Main.vue`+`User.vue`组成。
+    1. Main.vue
+        + 主要用来存放页面的功能模块，包括头部登录信息栏，标题栏，左侧导航栏，面包屑导航等。
+        + 主要功能包含左侧导航栏和右上角头像显示以及滑过后的展开一些跳转链接等。
+        + 退出登录功能：路由指向登录页`/login`，并清楚用户登录session数据。
+    2. User.vue
+        + 包含功能：列表显示、根据表头项排序、根据条件筛选数据、分页。
+            - 列表显示：
+                运用api.js中的`getUserListPage`方法来获取用户列表数据。
+                <pre>
+                if(this.seachItem == 'account'){
+                  para = {
+                    offset: (this.page - 1)*10,
+                    account:this.filters.name
+                  };
+                } else{
+                  para = {
+                    offset: (this.page - 1)*10,
+                    name:this.filters.name
+                  };
+                }
+                getUserListPage(para).then((res) => {
+                    this.total = res.data.total;
+                    this.users = res.data.rows;
+                    this.listLoading = false;
+                    //NProgress.done();
+                })
+                </pre>
+                > 其中para为参数部分，`offset`为数据偏移量-说白了就是数据从第几条开始，默认一次出10条数据。
+            - 分页    
+                > 原理同上，根据页数*条数来改变offset的值，从而获取新页的数据。
+            - 根据条件筛选数据
+                > 根据页面下来选来判断是通过账号查找，还是通过姓名查找，这个根据选项来传递参数是`account`还是`name`。然后与`offset`参数一起发送给接口，返回筛选后的数据。
+            - 根据标题项排序
+                > 此功能为element-ui 表格自带功能，只需在需要排序的列上加入`sortalbe`属性即可。例如：`<el-table-column prop="phone" label="电话" width="130" sortable></el-table-column>` 
+    3. 新增用户介绍
+        > 新增用户为当前页面弹出层实现。包含字段：
+        
+        | 字段名 | 描述 | 数据类型 | 验证规则 |
+        | :---- | :---- | :---- | :---- |
+        | account | 登录账号 | string | 1.非空 2.唯一 |
+        | password | 登录密码 | string | 1.非空 |
+        | gender | 性别，1-男，0-女 | string | 1.非空 |
+        | phone | 手机号 | string | 1.非空 2.正确手机号 |
+        | email | 邮箱 | string | 1.非空 2.正确邮箱 |
+        | isadmin | 是否为管理员 0-不是， 1-是 | string | 1.非空 |
+        
+        + 通过验证后，提交数据，利用api.js中的 `addUser` 方法，参数需要用到qs.stringify()来转换参数形式，以form参数post给后台对应接口。
+        + qs官方文档：https://www.npmjs.com/package/qs
+    4. 编辑用户介绍    
+        > 编辑用户为当前页面弹出层实现。与新增用户相似，包含字段：
+        
+        | 字段名 | 描述 | 数据类型 | 验证规则 |
+        | :---- | :---- | :---- | :---- |
+        | password | 登录密码 | string | 1.非空 |
+        | gender | 性别，1-男，0-女 | string | 1.非空 |
+        | phone | 手机号 | string | 1.非空 2.正确手机号 |
+        | email | 邮箱 | string | 1.非空 2.正确邮箱 |
+        | isadmin | 是否为管理员 0-不是， 1-是 | string | 1.非空 |
+        
+        + 获取当前要修改用户的信息，通过api.js中的 `getUserInfo` 方法取得用户信息，渲染到页面上。
+        + 修改信息，通过验证后，提交数据，利用api.js中的 `editUser` 方法，参数为用户id+form数据。
+    5. 删除用户介绍
+        > 删除用户为按钮形式，需要传递的参数为删除用户的id。
+        + 利用api.js中的 `batchRemoveUser` 方法，参数为删除的用户id。
+    6. 批量删除用户介绍
+        > 批量删除用户与删除用户基本相同，区别为传递的参数为多个id与逗号链接的字符串。
+    7. 设置用户角色功能说明
+        > 设置用户角色为按钮触发弹出层形式，利用element-ui的穿梭框形式来完成功能。
+        + 通过 api.js中的 `getRoleList` 方法获取所有角色信息，此处limit参数需要设置为大于角色信息的总条数，如：`limit:999`。
+        + 把获取到的所有角色信渲染到穿梭框中。
+        + 通过按钮触发设置角色信息的弹出层，并把当前用户包含的角色信息id赋值给穿梭框声明为已拥有此角色状态。
+        + 设置好后，通过 api.js中的 `setRole` 方法，参数为用户id+rolesId组成的无序列表。这里需要用到qs中的 `{ arrayFormat:'brackets' }` 这个参数来把rolesid数组转化为无序列表。
+4. 角色列表功能说明
