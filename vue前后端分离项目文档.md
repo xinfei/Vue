@@ -239,5 +239,56 @@ For Vue 1.x use: vue init webpack#1.0 my-project
         + 通过 api.js中的 `getRoleList` 方法获取所有角色信息，此处limit参数需要设置为大于角色信息的总条数，如：`limit:999`。
         + 把获取到的所有角色信渲染到穿梭框中。
         + 通过按钮触发设置角色信息的弹出层，并把当前用户包含的角色信息id赋值给穿梭框声明为已拥有此角色状态。
-        + 设置好后，通过 api.js中的 `setRole` 方法，参数为用户id+rolesId组成的无序列表。这里需要用到qs中的 `{ arrayFormat:'brackets' }` 这个参数来把rolesid数组转化为无序列表。
+        + 设置好后，通过 api.js中的 `setRole` 方法 ，参数为用户id+rolesId组成的无序列表。这里需要用到qs中的 `{ arrayFormat:'brackets' }` 这个参数来把rolesid数组转化为无序列表。
 4. 角色列表功能说明
+    > 角色列表由`Main.vue`+`Roles.vue`组成。
+    1. 角色列表与用户列表基本一致，包含功能：列表显示、根据表头项排序、根据条件筛选数据、分页。
+        + 运用api.js中的 `getRoleList` 方法来获取角色列表数据。传递参数 `offset:偏移量，通过页码计算` 、`keyword:筛选条件（名称/描述）`;
+    2. 新增角色介绍
+        > 新增用户为当前页面弹出层实现。包含字段：
+        
+        | 字段名 | 描述 | 数据类型 | 验证规则 |
+        | :---- | :---- | :---- | :---- |
+        | name | 角色名称 | string | 1.非空 2.20个字符以内 |
+        | desc | 角色描述 | string | 1.非空 2.100个字符以内 |
+        
+        + 通过验证后，提交数据，利用api.js中的 `addRole` 方法，参数需要用到qs.stringify()来转换参数形式，以form参数post给后台对应接口。
+    3. 编辑角色介绍
+        > 编辑角色为当前页面弹出层实现。与新增角色相似，包含字段：
+                
+        | 字段名 | 描述 | 数据类型 | 验证规则 |
+        | :---- | :---- | :---- | :---- |
+        | name | 角色名称 | string | 1.非空 2.20个字符以内 |
+        | desc | 角色描述 | string | 1.非空 2.100个字符以内 |
+        
+        + 获取当前要修改角色的信息，通过api.js中的 `getRole` 方法取得角色信息，渲染到页面上。
+        + 修改信息，通过验证后，提交数据，利用api.js中的 `editRole` 方法，参数为角色id+form数据。
+    4. 删除角色介绍
+        > 删除角色为按钮形式，需要传递的参数为删除角色的id。
+        + 利用api.js中的 `batchRemoveRole` 方法，参数为删除的角色id。
+    5. 批量删除用户介绍
+        > 批量删除角色与删除角色基本相同，区别为传递的参数为多个id与逗号链接的字符串。
+5. 个人信息修改功能说明
+    1. 登录密码修改
+        > 页面由`Main.vue`+`changePwd.vue`组成。包含字段：
+        
+        | 字段名 | 描述 | 数据类型 | 验证规则 |
+        | :---- | :---- | :---- | :---- |
+        | oldpwd | 旧密码 | string | 1.非空 |
+        | newpwd | 新密码 | string | 1.非空 |
+        
+        + 修改密码，通过验证后，提交数据，利用api.js中的 `changePwd` 方法，参数新旧密码。
+    2. 个人头像修改
+        > 页面由`Main.vue`+`changePhoto.vue`组成。
+        + 这里用到vue-cropper插件来实现图片的裁剪与上传。[官方文档](https://github.com/xyxiao001/vue-cropper "官方文档")、[预览](http://xyxiao.cn/vue-cropper/example/)
+        + 图片插件设置好后，这里裁剪后以 `base64` 格式输出，需要通过 `dataURLtoFile` 这个方法转换为 `file` 类型，最后提交到指定接口
+6. 打包与发布说明
+    > 本项目由vue-cli脚手架生成，所以自带webpack，打包发布用webpack来完成。
+    1. 在项目根目录下打开命令提示符窗口（cmd）运行 `npm run build` 会在项目 `dist` 中生成打包好的文件。运行index.html即可。
+        + 如果发现有问题可进行以下修改：
+            - 到项目目录下的 `config` 文件夹里的 `index.js` 文件中,将 `build` 对象下的 `assetsPublicPath` 中的 `/` ，改为 `./` 即可，就在前面加个点，如下：
+            ![图片](https://images2017.cnblogs.com/blog/1202901/201709/1202901-20170905104525522-142021100.png)
+            - 到项目目录下的 `build` 文件夹里的 `webpack.base.conf.js` 文件中，将 `publicPach` 改成 `./` ，如下图：
+            ![图片](http://img.bbs.csdn.net/upload/201610/27/1477541987_686403.png)
+        + 修改完成后，再次运行 `npm run build` 然后再运行新生成的 `index.html` ，大功告成~！    
+        
